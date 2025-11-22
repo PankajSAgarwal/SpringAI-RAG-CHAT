@@ -7,6 +7,19 @@
 ```properties
 spring.ai.vectorstore.qdrant.host=localhost
 spring.ai.vectorstore.qdrant.port=6334
+
+## Configuring chat memory size
+```
+@Bean
+
+```
+@Bean
+ChatMemory chatMemory(ChatMemoryRepository chatMemoryRepository) {
+    return MessageWindowChatMemory.builder()
+            .chatMemoryRepository(chatMemoryRepository)
+            .maxMessages(10)
+            .build();
+}
 ```
 ## Run the application
 - Run the application
