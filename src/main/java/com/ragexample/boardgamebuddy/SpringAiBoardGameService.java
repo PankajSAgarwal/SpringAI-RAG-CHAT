@@ -1,6 +1,7 @@
 package com.ragexample.boardgamebuddy;
 
 import static org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor.FILTER_EXPRESSION;
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,16 +20,16 @@ public class SpringAiBoardGameService implements BoardGameService {
     Resource promptTemplate;
 
     @Override
-    public Answer askQuestion(Question question) {
+    public Answer askQuestion(Question question, String conversationID) {
         String gameNameMatch = String.format("gameTitle == '%s'", normalizeGameTitle(question.gameTitle()));
-        var answer = chatClient
+        return chatClient
                 .prompt()
                 .system(systemSpec -> systemSpec.text(promptTemplate).param("gameTitle", question.gameTitle()))
                 .user(question.question())
-                .advisors(advisorSpec -> advisorSpec.param(FILTER_EXPRESSION, gameNameMatch))
+                .advisors(advisorSpec ->
+                        advisorSpec.param(FILTER_EXPRESSION, gameNameMatch).param(CONVERSATION_ID, conversationID))
                 .call()
                 .entity(Answer.class);
-        return answer;
     }
 
     private String normalizeGameTitle(String in) {
